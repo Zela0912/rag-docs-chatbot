@@ -1,5 +1,7 @@
 # Docs Chatbot: cited answers from your documentation
 
+[![CI](https://github.com/Zela0912/rag-docs-chatbot/actions/workflows/ci.yml/badge.svg)](https://github.com/Zela0912/rag-docs-chatbot/actions/workflows/ci.yml) ![Node.js 24+](https://img.shields.io/badge/node-%E2%89%A524-339933) ![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-3178c6) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 An AI support assistant that answers customer questions **only from your own documentation**, links every claim to the exact passage it came from, and says _"I couldn't find this"_ instead of guessing.
 
 Built with Node.js, React, TypeScript and the OpenAI API. Runs as a single process with SQLite and needs no vector database or other extra infrastructure.
