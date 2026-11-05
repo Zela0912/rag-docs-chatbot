@@ -1,0 +1,30 @@
+# Render Blueprint. Deploy your own copy:
+#   https://render.com/deploy?repo=https://github.com/Zela0912/rag-docs-chatbot
+# Render asks for OPENAI_API_KEY once, when the Blueprint is created.
+services:
+  - type: web
+    name: rag-docs-chatbot
+    runtime: node
+    # Free instances sleep after 15 idle minutes; the first request then takes about a minute.
+    # Switch to a paid plan (e.g. 0.5c-512mb) for an always-on demo.
+    plan: free
+    # US East: close to most clients and to the OpenAI API.
+    region: virginia
+    # devDependencies (Vite, TypeScript) are needed for the web build; Render sets
+    # NODE_ENV=production only at runtime, so npm ci installs them here.
+    buildCommand: npm ci && npm run build
+    # Render's filesystem is ephemeral, so the index is rebuilt on every start.
+    # For the demo docs this takes ~2 s and ~$0.00005 of embeddings.
+    startCommand: npm run ingest && npm start
+    healthCheckPath: /api/health
+    # Only deploy commits whose CI checks passed.
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      # One reverse proxy (Render's load balancer) in front of the app, so rate limiting sees client IPs.
+      - key: TRUST_PROXY
+        value: "1"
+      # Stricter than the default for a public link.
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "10"
