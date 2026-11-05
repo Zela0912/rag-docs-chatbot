@@ -1,35 +1,59 @@
 import path from 'node:path';
+import { z } from 'zod';
 
-// Project root (docs-chatbot/), so relative paths work no matter where the script is started.
-const root = path.resolve(import.meta.dirname, '../..');
+// Project root (docs-chatbot/), so relative paths work no matter where a script is started from.
+const ROOT = path.resolve(import.meta.dirname, '../..');
 
-function required(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing env var ${name}. Copy .env.example to .env and fill it in.`);
+const EnvSchema = z.object({
+  OPENAI_API_KEY: z.string({ error: 'is required. Copy .env.example to .env and add your key.' }).min(1),
+  CHAT_MODEL: z.string().default('gpt-6-luna'),
+  EMBEDDING_MODEL: z.string().default('text-embedding-3-small'),
+  /** How many chunks are handed to the model per question. */
+  TOP_K: z.coerce.number().int().min(1).max(20).default(5),
+  /**
+   * Chunks below this cosine similarity are treated as irrelevant. If none pass, we answer
+   * "not found" without calling the chat model. Calibrated with `npm run eval`.
+   */
+  MIN_SCORE: z.coerce.number().min(0).max(1).default(0.3),
+  /** Fuse vector search with BM25 keyword search (see retrieve.ts). Set to false to compare in `npm run eval`. */
+  HYBRID_SEARCH: z.enum(['true', 'false']).default('true'),
+  /** Hard cap on answer length, which also caps the cost of a single request. */
+  MAX_OUTPUT_TOKENS: z.coerce.number().int().positive().default(1000),
+  PRODUCT_NAME: z.string().default('TidyShift'),
+  PORT: z.coerce.number().int().positive().default(3001),
+  /** Requests per minute per IP on /api/chat. */
+  RATE_LIMIT_PER_MINUTE: z.coerce.number().int().positive().default(20),
+  /** Number of reverse proxies in front of the app (e.g. 1 on Render/Fly), so rate limiting sees real IPs. */
+  TRUST_PROXY: z.coerce.number().int().min(0).default(0),
+  DOCS_DIR: z.string().default('data/docs'),
+  DB_PATH: z.string().default('data/index.db'),
+});
+
+export type Config = ReturnType<typeof loadConfig>;
+
+export function loadConfig(env: NodeJS.ProcessEnv = process.env) {
+  // Treat `TOP_K=` (empty) the same as not set, so defaults apply.
+  const cleaned = Object.fromEntries(Object.entries(env).filter(([, value]) => value !== ''));
+  const parsed = EnvSchema.safeParse(cleaned);
+  if (!parsed.success) {
+    throw new Error(`Invalid configuration:\n${z.prettifyError(parsed.error)}`);
   }
-  return value;
-}
+  const e = parsed.data;
 
-function number(name: string, fallback: number): number {
-  const raw = process.env[name];
-  if (raw === undefined || raw === '') return fallback;
-  const value = Number(raw);
-  if (Number.isNaN(value)) throw new Error(`Env var ${name} must be a number, got "${raw}".`);
-  return value;
+  return {
+    openaiApiKey: e.OPENAI_API_KEY,
+    chatModel: e.CHAT_MODEL,
+    embeddingModel: e.EMBEDDING_MODEL,
+    topK: e.TOP_K,
+    minScore: e.MIN_SCORE,
+    hybridSearch: e.HYBRID_SEARCH === 'true',
+    maxOutputTokens: e.MAX_OUTPUT_TOKENS,
+    productName: e.PRODUCT_NAME,
+    port: e.PORT,
+    rateLimitPerMinute: e.RATE_LIMIT_PER_MINUTE,
+    trustProxy: e.TRUST_PROXY,
+    docsDir: path.resolve(ROOT, e.DOCS_DIR),
+    dbPath: path.resolve(ROOT, e.DB_PATH),
+    webDistDir: path.resolve(ROOT, 'web/dist'),
+  };
 }
-
-export const config = {
-  openaiApiKey: required('OPENAI_API_KEY'),
-  chatModel: process.env.CHAT_MODEL || 'gpt-6-luna',
-  embeddingModel: process.env.EMBEDDING_MODEL || 'text-embedding-3-small',
-  // How many chunks we hand to the model per question.
-  topK: number('TOP_K', 5),
-  // Chunks below this cosine similarity are treated as "not relevant".
-  // If nothing passes, we answer "not found" without calling the chat model at all.
-  minScore: number('MIN_SCORE', 0.3),
-  productName: process.env.PRODUCT_NAME || 'TidyShift',
-  port: number('PORT', 3001),
-  docsDir: path.resolve(root, process.env.DOCS_DIR || 'data/docs'),
-  dbPath: path.resolve(root, process.env.DB_PATH || 'data/index.db'),
-};

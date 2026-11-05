@@ -4,3 +4,4 @@ data/*.db
 data/*.db-*
 dist/
 .DS_Store
+coverage/

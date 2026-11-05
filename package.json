@@ -2,11 +2,35 @@
   "name": "docs-chatbot",
   "private": true,
   "type": "module",
-  "workspaces": ["server"],
+  "workspaces": [
+    "server",
+    "web"
+  ],
   "scripts": {
-    "dev": "npm run dev -w server",
+    "dev": "concurrently -k -n api,web -c blue,magenta \"npm run dev -w server\" \"npm run dev -w web\"",
+    "build": "npm run build -w web",
+    "start": "npm run start -w server",
     "ingest": "npm run ingest -w server",
-    "typecheck": "npm run typecheck -w server"
+    "eval": "npm run eval -w server --",
+    "search": "npm run search -w server --",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "typecheck": "npm run typecheck --workspaces",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build"
   },
-  "engines": { "node": ">=24" }
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.5",
+    "@vitest/coverage-v8": "^5.1.0",
+    "concurrently": "^10.0.6",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  },
+  "description": "AI support chatbot that answers from your documentation with verifiable citations (RAG, Node.js, React, OpenAI).",
+  "license": "MIT"
 }

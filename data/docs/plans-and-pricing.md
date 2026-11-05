@@ -4,12 +4,12 @@ TidyShift is billed per active employee per month. An active employee is anyone 
 
 ## Plans
 
-| Plan | Monthly price | Best for |
-|------|---------------|----------|
-| Free | $0, up to 10 employees, 1 location | Trying TidyShift with a small team |
-| Starter | $4 per active employee | Single-location businesses |
-| Pro | $7 per active employee | Multiple locations, payroll and integrations |
-| Enterprise | Custom pricing, minimum 200 employees | SSO, audit log, dedicated support |
+| Plan       | Monthly price                         | Best for                                     |
+| ---------- | ------------------------------------- | -------------------------------------------- |
+| Free       | $0, up to 10 employees, 1 location    | Trying TidyShift with a small team           |
+| Starter    | $4 per active employee                | Single-location businesses                   |
+| Pro        | $7 per active employee                | Multiple locations, payroll and integrations |
+| Enterprise | Custom pricing, minimum 200 employees | SSO, audit log, dedicated support            |
 
 ### What each plan includes
 

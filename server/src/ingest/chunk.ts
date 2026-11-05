@@ -12,9 +12,7 @@ const MAX_CHARS = 1500;
 const OVERLAP_CHARS = 200;
 
 export function chunkSections(sections: Section[]): Chunk[] {
-  return sections.flatMap((section) =>
-    splitText(section.text).map((text) => ({ location: section.location, text })),
-  );
+  return sections.flatMap((section) => splitText(section.text).map((text) => ({ location: section.location, text })));
 }
 
 /**
@@ -28,9 +26,7 @@ export function embeddingInput(title: string, chunk: Chunk): string {
 function splitText(text: string): string[] {
   if (text.length <= MAX_CHARS) return [text];
 
-  const paragraphs = text
-    .split(/\n\s*\n/)
-    .flatMap((p) => (p.length > MAX_CHARS ? splitLongParagraph(p) : [p]));
+  const paragraphs = text.split(/\n\s*\n/).flatMap((p) => (p.length > MAX_CHARS ? splitLongParagraph(p) : [p]));
 
   const chunks: string[] = [];
   let current = '';
