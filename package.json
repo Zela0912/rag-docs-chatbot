@@ -1,0 +1,12 @@
+{
+  "name": "docs-chatbot",
+  "private": true,
+  "type": "module",
+  "workspaces": ["server"],
+  "scripts": {
+    "dev": "npm run dev -w server",
+    "ingest": "npm run ingest -w server",
+    "typecheck": "npm run typecheck -w server"
+  },
+  "engines": { "node": ">=24" }
+}
