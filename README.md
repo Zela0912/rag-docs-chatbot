@@ -6,6 +6,8 @@ An AI support assistant that answers customer questions **only from your own doc
 
 Built with Node.js, React, TypeScript and the OpenAI API. Runs as a single process with SQLite and needs no vector database or other extra infrastructure.
 
+**[Live demo →](https://rag-docs-chatbot-pqc3.onrender.com/)** Try _"Can I get a refund on an annual plan?"_, then _"And on a monthly plan?"_. It runs on a free instance, so the first visit after a quiet period can take about a minute to wake up.
+
 ![Answer with a cited source opened](docs/screenshots/answer-light.png)
 
 > **Demo data:** _TidyShift_ is a fictional shift-scheduling SaaS. Its help center lives in [`data/docs`](data/docs). Drop in your own Markdown or PDF files and run `npm run ingest`.
